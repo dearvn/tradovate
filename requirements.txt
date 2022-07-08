@@ -1,0 +1,4 @@
+redis
+pytz
+requests
+websocket-client
