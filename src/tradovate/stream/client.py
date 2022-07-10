@@ -63,7 +63,7 @@ class Client(Profile):
         for websocket in self._websockets:
             self._loop.create_task(self.process_message(websocket))
 
-        self._dispatch('connect')
+        self._dispatch('trade')
 
     # -Instance Methods: Public
     async def authorize(
@@ -133,7 +133,7 @@ class Client(Profile):
             self._loop.close()
 
     async def subscribe_symbol(
-        self, id_: int | str, *, dom: bool = True, histogram: bool = True
+        self, id_: int | str, *, dom: bool = True, histogram: bool = True, chart: bool = True
     ) -> None:
         '''Add symbol to market subscription'''
         if not self._mdlive:
@@ -148,6 +148,21 @@ class Client(Profile):
         if not histogram:
             return None
         await self._mdlive.request(urls.wss_market_histogram_sub, body={"symbol": id_})
+        # -Chart
+        if not chart:
+            return None
+        await self._mdlive.request(urls.wss_market_chart_sub, body={"symbol": id_,
+                                                                    "chartDescription": {
+                                                                        "underlyingType": 'MinuteBar',
+                                                                        "elementSize": 60,
+                                                                        "elementSizeUnit": 'UnderlyingUnits',
+                                                                        "withHistogram": False,
+                                                                    },
+                                                                    "timeRange": {
+                                                                        "asFarAsTimestamp": '2022-07-01',
+                                                                        "closestTimestamp": '2022-07-08'
+                                                                    }
+        })
 
     async def sync_websockets(self) -> None:
         for websocket in self._websockets_account:
@@ -158,6 +173,7 @@ class Client(Profile):
         await self._mdlive.request(urls.wss_market_usub, body={"symbol": id_})
         await self._mdlive.request(urls.wss_market_dom_usub, body={"symbol": id_})
         await self._mdlive.request(urls.wss_market_histogram_usub, body={"symbol": id_})
+        await self._mdlive.request(urls.wss_market_chart_usub, body={"symbol": id_})
 
     # -Properties: Private
     @property
