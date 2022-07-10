@@ -26,6 +26,7 @@ REQUIRED = [
     'pytz',
     'requests',
     'websocket-client',
+    'aiohttp'
 ]
 
 # What packages are optional?
