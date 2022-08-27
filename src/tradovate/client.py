@@ -1,35 +1,103 @@
-import os
-from .session import TOSession
-from .exceptions import handle_error_response, TOAPIError
-from .config import URLs
+## Imports
+from __future__ import annotations
+import asyncio,redis,logging,json,os
 
-def response_is_valid(resp):
-    return resp.status_code in (200, 201, 204)
+from datetime import datetime,timedelta
+
+from .auth import Profile
+from .accounting import Accounting
+from .auth.session import Session
+from .stream.utils import urls
+from .stream.utils.typing import CredentialAuthDict
+
+## Constants
+log = logging.getLogger(__name__)
+redis_client = redis.Redis(host=os.environ.get("REDIS_HOST", "redis"),
+            port=int(os.environ.get("REDIS_PORT", "6379")),
+            decode_responses=True)
 
 
-class TOClient(object):
-    def __init__(self, user_id=None):
-        self._userId = user_id or 1
-        self.URL = URLs[os.getenv('TO_ENV')]
-        self.session = TOSession(self._userId)
+## Classes
+class Client(Profile):
+    """Tradovate Client"""
 
-    def _request(self, url, method="GET", params=None, *args, **kwargs):
-        url = f"{self.URL + url}"
-        resp = self.session.request(method, self.URL.url, params=params, *args, **kwargs)
-        if not response_is_valid(resp):
-            handle_error_response(resp)
-        return resp
+    # -Constructor
+    def __init__(self) -> Client:
+        self._loop: asyncio.AbstractEventLoop = asyncio.new_event_loop()
+        self._session: Session = Session(loop=self._loop)
+        self._handle_auto_renewal: asyncio.TimerHandle | None = None
 
-    def _get(self, url, params=None, *args, **kwargs):
-        url = f"{self.URL + url}"
-        resp = self.session.request("GET", url, params=params, *args, **kwargs)
-        if not response_is_valid(resp):
-            handle_error_response(resp)
-        return resp.json()
+        accounting = Accounting(self._session)
+        account = asyncio.run(accounting.account_list())
 
-    def _post(self, url, params=None, *args, **kwargs):
-        url = f"{self.URL + url}"
-        resp = self.session.request("POST", url, params=params, *args, **kwargs)
-        if not response_is_valid(resp):
-            handle_error_response(resp)
-        return resp.json()
+        self.id = account[0]['id']
+        self.name = account[0]['name']
+
+    @property
+    def accounting(self) -> Accounting:
+        return Accounting(self._session)
+
+    def run(self, event, *args, **kwargs) -> None:
+        '''Public client loop run method'''
+        self._loop.run_until_complete(self._run(event, *args, **kwargs))
+        try:
+            self._loop.run_forever()
+        except KeyboardInterrupt:
+            for task in asyncio.all_tasks(loop=self._loop):
+                task.cancel()
+            self._loop.run_until_complete(self.close())
+            self._loop.close()
+
+    async def _run(self, event, *args, **kwargs) -> None:
+        self._dispatch(event=event, *args, **kwargs)
+
+    # -Instance Methods: Private
+    def _dispatch(self, event: str, *args, **kwargs) -> None:
+        '''Dispatch task for event name'''
+        log.debug(f"Client event '{event}'")
+
+        method = event
+        try:
+            coro = getattr(self, method)
+        except AttributeError:
+            pass
+        else:
+            self._loop.create_task(coro(*args, **kwargs))
+
+    async def _renewal(self) -> None:
+        '''Task for Session authorization renewal loop'''
+        while self._session.authenticated.is_set():
+            time = self._session.token_duration - timedelta(minutes=10)
+            await asyncio.sleep(time.total_seconds())
+            await self._session.renew_access_token()
+
+    # -Instance Methods: Public
+    async def authorize(
+        self, auth: CredentialAuthDict, auto_renew: bool = True
+    ) -> None:
+        '''Initialize Client authorization and auto-renewal'''
+        self.id = await self._session.request_access_token(auth)
+        if auto_renew:
+            self._loop.create_task(self._renewal(), name="client-renewal")
+
+    async def authorizion_hold(self) -> None:
+        '''Wait for all authentication setup to be finished'''
+        await self._session.authenticated.wait()
+
+
+    async def close(self) -> None:
+        await self._session.close()
+
+
+    async def process_message(self) -> None:
+        '''Task for WebSocket loop'''
+        print(">>>>>>>")
+
+
+    # -Properties: Authenticated
+    @property
+    def authenticated(self) -> bool:
+        if not self._session.authenticated.is_set():
+            return False
+
+        return True

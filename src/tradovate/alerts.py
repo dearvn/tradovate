@@ -1,51 +1,55 @@
-from .client import TOClient
+from __future__ import annotations
 
+class Alerts:
+    """Class of methods related to alerts."""
 
-class Alerts(TOClient):
+    # -Constructor
+    def __init__(self, session) -> Alerts:
+        self.session = session
 
-    def complete_alert_signal(self, admin_alert_signal_id: int) -> dict:
+    async def complete_alert_signal(self, admin_alert_signal_id: int) -> dict:
         """An "Incomplete" notification is one that has not yet been viewed by a user.
            Once a user has interacted with a notification it should be "completed"."""
-        return self._post(
-            url="/adminAlertSignal/completealertsignal",
+        return await self.session.post(
+            url="adminAlertSignal/completealertsignal",
             payload={"adminAlertSignalId": admin_alert_signal_id},
         )
 
-    def admin_alert_signal_dependents(self, master_id: int) -> dict:
+    async def admin_alert_signal_dependents(self, master_id: int) -> dict:
         """Retrieves all entities of AdminAlertSignal type related to AdminAlert entity."""
-        return self._get(f"/adminAlertSignal/deps?master_id={master_id}")
+        return await self.session.get(f"adminAlertSignal/deps?master_id={master_id}")
 
-    def admin_alert_signal_item(self, id: int) -> dict:
+    async def admin_alert_signal_item(self, id: int) -> dict:
         """Retrieves an entity of AdminAlertSignal type by its id."""
-        return self._get(f"/adminAlertSignal/item?id={id}")
+        return await self.session.get(f"adminAlertSignal/item?id={id}")
 
-    def admin_alert_signal_items(self, ids: []) -> dict:
+    async def admin_alert_signal_items(self, ids: list[int]) -> dict:
         """Retrieves multiple entities of AdminAlertSignal type by its ids."""
-        return self._get(f"/adminAlertSignal/items?ids={','.join([str(id) for id in ids])}")
+        return await self.session.get(f"adminAlertSignal/items?ids={','.join([str(id) for id in ids])}")
 
-    def admin_alert_signal_L_dependents(self, master_ids: []) -> dict:
+    async def admin_alert_signal_L_dependents(self, master_ids: list[int]) -> dict:
         """Retrieves all entities of AdminAlertSignal type related to multiple entities of AdminAlert type."""
-        return self._get(f"/adminAlertSignal/ldeps?masterids={','.join([str(id) for id in master_ids])}")
+        return await self.session.get(f"adminAlertSignal/ldeps?masterids={','.join([str(id) for id in master_ids])}")
 
-    def admin_alert_signal_list(self) -> dict:
+    async def admin_alert_signal_list(self) -> dict:
         """Retrieves all entities of AdminAlertSignal type."""
-        return self._get("/adminAlertSignal/list")
+        return await self.session.get("/adminAlertSignal/list")
 
-    def take_alert_signal_ownership(self, admin_alert_signal_id: int) -> dict:
+    async def take_alert_signal_ownership(self, admin_alert_signal_id: int) -> dict:
         """Internal. Can be used by B2B partners to mark an adminAlertSignal entity for further handling."""
-        return self._post(
-            url="/adminAlertSignal/takealertsignalownership",
+        return await self.session.post(
+            url="adminAlertSignal/takealertsignalownership",
             payload={"adminAlertSignalId": admin_alert_signal_id},
         )
 
-    def create_alert(self,
+    async def create_alert(self,
                            expression: str,
                            valid_until: str,
                            trigger_limits: int,
                            message: str) -> dict:
         """Create an alert entity associated with the user."""
-        return self._post(
-            url="/alert/createalert",
+        return await self.session.post(
+            url="alert/createalert",
             payload={
                 "expression": expression,
                 "validUntil": valid_until,
@@ -54,51 +58,51 @@ class Alerts(TOClient):
             },
         )
 
-    def delete_alert(self, alert_id: int) -> dict:
+    async def delete_alert(self, alert_id: int) -> dict:
         """Remove an alert entity associated with the user."""
-        return self._post(
-            url="/alert/deletealert",
+        return await self.session.post(
+            url="alert/deletealert",
             payload={"alertId": alert_id},
         )
 
-    def alert_dependents(self, master_id: int) -> dict:
+    async def alert_dependents(self, master_id: int) -> dict:
         """Retrieves all entities of Alert type related to User entity."""
-        return self._get(f"/alert/deps?master_id={master_id}")
+        return await self.session.get(f"alert/deps?master_id={master_id}")
 
-    def dismiss_alert(self, alert_id: int) -> dict:
+    async def dismiss_alert(self, alert_id: int) -> dict:
         """Dismiss an alert for a user."""
-        return self._post(
-            url="/alert/dismissalert",
+        return await self.session.post(
+            url="alert/dismissalert",
             payload={"alertId": alert_id},
         )
 
-    def alert_item(self, id: int) -> dict:
+    async def alert_item(self, id: int) -> dict:
         """Retrieves an entity of Alert type by its id."""
-        return self._get(f"/alert/item?id={id}")
+        return await self.session.get(f"alert/item?id={id}")
 
-    def alert_items(self, ids: []) -> dict:
+    async def alert_items(self, ids: list[int]) -> dict:
         """Retrieves multiple entities of Alert type by its ids."""
-        return self._get(f"/alert/items?ids={','.join([str(id) for id in ids])}")
+        return await self.session.get(f"alert/items?ids={','.join([str(id) for id in ids])}")
 
-    def alert_L_dependents(self, master_ids: []) -> dict:
+    async def alert_L_dependents(self, master_ids: list[int]) -> dict:
         """Retrieves all entities of Alert type related to multiple entities of User type."""
-        return self._get(f"/alert/ldeps?masterids={','.join([str(id) for id in master_ids])}")
+        return await self.session.get(f"alert/ldeps?masterids={','.join([str(id) for id in master_ids])}")
 
-    def alert_list(self) -> dict:
+    async def alert_list(self) -> dict:
         """Retrieves all entities of Alert type."""
-        return self._get("/alert/list")
+        return await self.session.get("/alert/list")
 
-    def mark_read_alert_signal(self, alert_id: int, alert_signal_id: int) -> dict:
+    async def mark_read_alert_signal(self, alert_id: int, alert_signal_id: int) -> dict:
         """Mark an alert entity as 'read' for a user."""
-        return self._post(
-            url="/alert/markreadalertsignal",
+        return await self.session.post(
+            url="alert/markreadalertsignal",
             payload={
                 "alertId": alert_id,
                 "alertSignalId": alert_signal_id,
             },
         )
 
-    def modify_alert(self,
+    async def modify_alert(self,
                            alert_id: int,
                            expression: str,
                            valid_until: str = None,
@@ -116,38 +120,38 @@ class Alerts(TOClient):
         if message is not None:
             payload["message"] = message
 
-        return self._post(
-            url="/alert/modifyalert",
+        return await self.session.post(
+            url="alert/modifyalert",
             payload=payload,
         )
 
-    def reset_alert(self, alert_id: int) -> dict:
+    async def reset_alert(self, alert_id: int) -> dict:
         """
             Resets an alert.
             You can use this method after an alert has been triggered
             to keep the alert and wait for the alert to be triggered again.
         """
-        return self._post(
-            url="/alert/resetalert",
+        return await self.session.post(
+            url="alert/resetalert",
             payload={"alertId": alert_id},
         )
 
-    def alert_signal_dependents(self, master_id: int) -> dict:
+    async def alert_signal_dependents(self, master_id: int) -> dict:
         """Retrieves all entities of AlertSignal type related to Alert entity."""
-        return self._get(f"/alertSignal/deps?masterid={master_id}")
+        return await self.session.get(f"alertSignal/deps?masterid={master_id}")
 
-    def alert_signal_item(self, id: int) -> dict:
+    async def alert_signal_item(self, id: int) -> dict:
         """Retrieves an entity of AlertSignal type by its id."""
-        return self._get(f"/alertSignal/item?id={id}")
+        return await self.session.get(f"alertSignal/item?id={id}")
 
-    def alert_signal_items(self, ids: []) -> dict:
+    async def alert_signal_items(self, ids: list[int]) -> dict:
         """Retrieves multiple entities of AlertSignal type by its ids."""
-        return self._get(f"/alertSignal/items?ids={','.join([str(id) for id in ids])}")
+        return await self.session.get(f"alertSignal/items?ids={','.join([str(id) for id in ids])}")
 
-    def alert_signal_L_dependents(self, master_ids: []) -> dict:
+    async def alert_signal_L_dependents(self, master_ids: list[int]) -> dict:
         """Retrieves all entities of AlertSignal type related to multiple entities of Alert type."""
-        return self._get(f"/alertSignal/ldeps?masterids={','.join([str(id) for id in master_ids])}")
+        return await self.session.get(f"alertSignal/ldeps?masterids={','.join([str(id) for id in master_ids])}")
 
-    def alert_signal_list(self) -> dict:
+    async def alert_signal_list(self) -> dict:
         """Retrieves all entities of AlertSignal type."""
-        return self._get("/alertSignal/list")
+        return await self.session.get("alertSignal/list")

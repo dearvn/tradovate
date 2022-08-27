@@ -1,48 +1,59 @@
-from .client import TOClient
+from __future__ import annotations
+
+from .client import Client
 
 
-class Positions(TOClient):
+class Positions(Client):
 
-    def fill_pair_dependents(self, master_id: int) -> dict:
+    async def exit_order(self):
+        #entry = await self.place_order(cl_ord_id=4165014211,account_spec=self.name, account_id=self.id, price=4157, action='Buy', symbol='MESU2', order_qty=1, order_type='Limit')
+        #print("===============",entry)
+
+        item = await self.fill_pair_list()
+        print(item)
+
+
+
+    async def fill_pair_dependents(self, master_id: int) -> dict:
         """Retrieves all entities of FillPair type related to Position entity."""
-        return self._get(f"fillPair/deps?id={master_id}")
+        return await self.session.get(f"fillPair/deps?id={master_id}")
 
-    def fill_pair_item(self, id: int) -> dict:
+    async def fill_pair_item(self, id: int) -> dict:
         """Retrieves an entity of FillPair type by its id."""
-        return self._get(f"/fillPair/item?id={id}")
+        return await self.session.get(f"fillPair/item?id={id}")
 
-    def fill_pair_items(self, ids: []) -> dict:
+    async def fill_pair_items(self, ids: list[int]) -> dict:
         """Retrieves multiple entities of FillPair type by its ids."""
-        return self._get(f"/fillPair/items?ids{','.join([str(id) for id in ids])}")
+        return await self.session.get(f"fillPair/items?ids{','.join([str(id) for id in ids])}")
 
-    def fill_pair_l_dependents(self, master_ids: []) -> dict:
+    async def fill_pair_l_dependents(self, master_ids: list[int]) -> dict:
         """Retrieves all entities of FillPair type related to multiple entities of Position type."""
-        return self._get(f"/fillPair/ldeps?masterids={','.join([str(id) for id in master_ids])}")
+        return await self.session.get(f"fillPair/ldeps?masterids={','.join([str(id) for id in master_ids])}")
 
-    def fill_pair_list(self) -> dict:
+    async def fill_pair_list(self) -> dict:
         """Retrieves all entities of FillPair type."""
-        return self._get("/fillPair/list")
+        return await self.session.get("fillPair/list")
 
-    def position_dependents(self, master_id: int) -> dict:
+    async def position_dependents(self, master_id: int) -> dict:
         """Retrieves all entities of Position type related to Account entity."""
-        return self._get(f"/postion/deps?masterid={master_id}")
+        return await self.session.get(f"postion/deps?masterid={master_id}")
 
-    def position_find(self, name: str) -> dict:
+    async def position_find(self, name: str) -> dict:
         """Retrieves an entity of Position type by its name."""
-        return self._get(f"/position/find?name={name}")
+        return await self.session.get(f"position/find?name={name}")
 
-    def position_item(self, id: int) -> dict:
+    async def position_item(self, id: int) -> dict:
         """Retrieves an entity of Position type by its id."""
-        return self._get(f"/position/item?id={id}")
+        return await self.session.get(f"position/item?id={id}")
 
-    def position_items(self, ids: []) -> dict:
+    async def position_items(self, ids: list[int]) -> dict:
         """Retrieves multiple entities of Position type by its ids."""
-        return self._get(f"/position/items?ids={','.join([str(id) for id in ids])}")
+        return await self.session.get(f"position/items?ids={','.join([str(id) for id in ids])}")
 
-    def position_l_dependents(self, master_ids: []) -> dict:
+    async def position_l_dependents(self, master_ids: list[int]) -> dict:
         """Retrieves all entities of Position type related to multiple entities of Account type."""
-        return self._get(f"/postion/ldeps?masterids={','.join([str(id) for id in master_ids])}")
+        return await self.session.get(f"postion/ldeps?masterids={','.join([str(id) for id in master_ids])}")
 
-    def position_list(self) -> dict:
+    async def position_list(self) -> dict:
         """Retrieves all entities of Position type."""
-        return self._get("/position/list")
+        return await self.session.get("position/list")

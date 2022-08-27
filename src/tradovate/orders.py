@@ -1,145 +1,170 @@
-from .client import TOClient
+from __future__ import annotations
+import asyncio,redis,logging,json,os
+
+from .client import Client
+#from .auth import Profile
+#from .auth.session import Session
+#from .accounting import Accounting
 
 
-class Orders(TOClient):
+class Orders(Client):
+    """Tradovate Client"""
 
-    def command_dependents(self, master_id: int) -> dict:
+    async def put_order(self):
+        entry = await self.place_order(account_spec=self.name, account_id=self.id, action='Sell', symbol='MESU2', order_qty=1, order_type='Market')
+
+    async def call_order(self):
+        entry = await self.place_order(account_spec=self.name, account_id=self.id, action='Buy', symbol='MESU2',
+                                       order_qty=1, order_type='Market')
+
+    async def get_order_list(self):
+        orders = await self.order_list()
+        print(orders)
+        #return orders
+
+    """Class of methods related to orders."""
+
+    # -Constructor
+    #def __init__(self, session) -> Orders:
+    #    self._session = session
+
+    async def command_dependents(self, master_id: int) -> dict:
         """Retrieves all entities of Command type related to Order entity."""
-        return self._get(f"/command/deps?masterid={master_id}")
+        return await self._session.get(f"command/deps?masterid={master_id}")
 
-    def command_item(self, id: int) -> dict:
+    async def command_item(self, id: int) -> dict:
         """Retrieves an entity of Command type by its id."""
-        return self._get(f"/command/item?id={id}")
+        return await self._session.get(f"command/item?id={id}")
 
-    def command_items(self, ids: []) -> dict:
+    async def command_items(self, ids: list[int]) -> dict:
         """Retrieves multiple entities of Command type by its ids."""
-        return self._get(
-            f"/command/items?ids={','.join([str(id) for id in ids])}",
+        return await self._session.get(
+            f"command/items?ids={','.join([str(id) for id in ids])}",
         )
 
-    def command_L_dependents(self, master_ids: []) -> dict:
+    async def command_L_dependents(self, master_ids: list[int]) -> dict:
         """Retrieves all entities of Command type related to multiple entities of Order type."""
-        return self._get(
-            f"/command/ldeps?masterids={','.join([str(id) for id in master_ids])}",
+        return await self._session.get(
+            f"command/ldeps?masterids={','.join([str(id) for id in master_ids])}",
         )
 
-    def command_list(self) -> dict:
+    async def command_list(self) -> dict:
         """Retrieves all entities of Command type."""
-        return self._get("/command/list")
+        return await self._session.get("command/list")
 
-    def command_report_dependents(self, master_id: int) -> dict:
+    async def command_report_dependents(self, master_id: int) -> dict:
         """Retrieves all entities of CommandReport type related to Command entity."""
-        return self._get(f"/commandReport/deps?masterid={master_id}")
+        return await self._session.get(f"commandReport/deps?masterid={master_id}")
 
-    def command_report_item(self, id: int) -> dict:
+    async def command_report_item(self, id: int) -> dict:
         """Retrieves an entity of CommandReport type by its id."""
-        return self._get(f"/commandReport/item?id={id}")
+        return await self._session.get(f"commandReport/item?id={id}")
 
-    def command_report_items(self, ids: []) -> dict:
+    async def command_report_items(self, ids: list[int]) -> dict:
         """Retrieves multiple entities of CommandReport type by its ids."""
-        return self._get(
-            f"/commandReport/items?ids={','.join([str(id) for id in ids])}",
+        return await self._session.get(
+            f"commandReport/items?ids={','.join([str(id) for id in ids])}",
         )
 
-    def command_report_L_dependents(self, master_ids: []) -> dict:
+    async def command_report_L_dependents(self, master_ids: list[int]) -> dict:
         """Retrieves all entities of CommandReport type related to multiple entities of Command type."""
-        return self._get(
-            f"/commandReport/ldeps?masterids={','.join([str(id) for id in master_ids])}",
+        return await self._session.get(
+            f"commandReport/ldeps?masterids={','.join([str(id) for id in master_ids])}",
         )
 
-    def command_report_list(self) -> dict:
+    async def command_report_list(self) -> dict:
         """Retrieves all entities of CommandReport type."""
-        return self._get("/commandReport/list")
+        return await self._session.get("commandReport/list")
 
-    def execution_report_dependents(self, master_id: int) -> dict:
+    async def execution_report_dependents(self, master_id: int) -> dict:
         """Retrieves all entities of ExecutionReport type related to Command entity."""
-        return self._get(f"/executionReport/deps?masterid={master_id}")
+        return await self._session.get(f"executionReport/deps?masterid={master_id}")
 
-    def execution_report_find(self, name: str) -> dict:
+    async def execution_report_find(self, name: str) -> dict:
         """Retrieves an entity of ExecutionReport type by its name."""
-        return self._get(f"/executionReport/find?name={name}")
+        return await self._session.get(f"executionReport/find?name={name}")
 
-    def execution_report_item(self, id: int) -> dict:
+    async def execution_report_item(self, id: int) -> dict:
         """Retrieves an entity of ExecutionReport type by its id."""
-        return self._get(f"/executionReport/item?id={id}")
+        return await self._session.get(f"executionReport/item?id={id}")
 
-    def execution_report_items(self, ids: []) -> dict:
+    async def execution_report_items(self, ids: list[int]) -> dict:
         """Retrieves multiple entities of ExecutionReport type by its ids."""
-        return self._get(
-            f"/executionReport/items?ids={','.join([str(id) for id in ids])}",
+        return await self._session.get(
+            f"executionReport/items?ids={','.join([str(id) for id in ids])}",
         )
 
-    def execution_report_L_dependents(self, master_ids: []) -> dict:
+    async def execution_report_L_dependents(self, master_ids: list[int]) -> dict:
         """Retrieves all entities of ExecutionReport type related to multiple entities of Command type."""
-        return self._get(
-            f"/executionReport/ldeps?masterids={','.join([str(id) for id in master_ids])}",
+        return await self._session.get(
+            f"executionReport/ldeps?masterids={','.join([str(id) for id in master_ids])}",
         )
 
-    def execution_report_list(self) -> dict:
+    async def execution_report_list(self) -> dict:
         """Retrieves all entities of ExecutionReport type."""
-        return self._get("/executionReport/list")
+        return await self._session.get("executionReport/list")
 
-    def execution_report_suggest(self, text: str, n_entities: int) -> dict:
+    async def execution_report_suggest(self, text: str, n_entities: int) -> dict:
         """Retrieves entities of ExecutionReport type filtered by an occurrence of a text in one of its fields."""
-        return self._get(f"/executionReport/suggest?t={text}&l={n_entities}")
+        return await self._session.get(f"executionReport/suggest?t={text}&l={n_entities}")
 
-    def fill_dependents(self, master_id: int) -> dict:
+    async def fill_dependents(self, master_id: int) -> dict:
         """Retrieves all entities of Fill type related to Order entity."""
-        return self._get(f"/fill/deps?masterid={master_id}")
+        return await self._session.get(f"fill/deps?masterid={master_id}")
 
-    def fill_item(self, id: int) -> dict:
+    async def fill_item(self, id: int) -> dict:
         """Retrieves an entity of Fill type by its id."""
-        return self._get(f"/fill/item?id={id}")
+        return await self._session.get(f"fill/item?id={id}")
 
-    def fill_items(self, ids: []) -> dict:
+    async def fill_items(self, ids: list[int]) -> dict:
         """Retrieves multiple entities of Fill type by its ids."""
-        return self._get(
-            f"/fill/items?ids={','.join([str(id) for id in ids])}",
+        return await self._session.get(
+            f"fill/items?ids={','.join([str(id) for id in ids])}",
         )
 
-    def fill_L_dependents(self, master_ids: []) -> dict:
+    async def fill_L_dependents(self, master_ids: list[int]) -> dict:
         """Retrieves all entities of Fill type related to multiple entities of Order type."""
-        return self._get(
-            f"/fill/ldeps?masterids={','.join([str(id) for id in master_ids])}",
+        return await self._session.get(
+            f"fill/ldeps?masterids={','.join([str(id) for id in master_ids])}",
         )
 
-    def fill_list(self) -> dict:
+    async def fill_list(self) -> dict:
         """Retrieves all entities of Fill type."""
-        return self._get("/fill/list")
+        return await self._session.get("fill/list")
 
-    def fill_fee_dependent(self, master_id: int) -> dict:
+    async def fill_fee_dependent(self, master_id: int) -> dict:
         """Retrieves all entities of FillFee type related to Fill entity."""
-        return self._get(f"/fillFee/deps?masterid={master_id}")
+        return await self._session.get(f"fillFee/deps?masterid={master_id}")
 
-    def fill_fee_item(self, id: int) -> dict:
+    async def fill_fee_item(self, id: int) -> dict:
         """Retrieves an entity of FillFee type by its id."""
-        return self._get(f"/fillFee/item?id={id}")
+        return await self._session.get(f"fillFee/item?id={id}")
 
-    def fill_fee_items(self, ids: []) -> dict:
+    async def fill_fee_items(self, ids: list[int]) -> dict:
         """Retrieves multiple entities of FillFee type by its ids."""
-        return self._get(
-            f"/fillFee/items?ids={','.join([str(id) for id in ids])}",
+        return await self._session.get(
+            f"fillFee/items?ids={','.join([str(id) for id in ids])}",
         )
 
-    def fill_fee_L_dependents(self, master_ids: []) -> dict:
+    async def fill_fee_L_dependents(self, master_ids: list[int]) -> dict:
         """Retrieves all entities of FillFee type related to multiple entities of Fill type."""
-        return self._get(
-            f"/fillFee/ldeps?masterids={','.join([str(id) for id in master_ids])}",
+        return await self._session.get(
+            f"fillFee/ldeps?masterids={','.join([str(id) for id in master_ids])}",
         )
 
-    def fill_fee_list(self) -> dict:
+    async def fill_fee_list(self) -> dict:
         """Retrieves all entities of FillFee type."""
-        return self._get("/fillFee/list")
+        return self._session.get("fillFee/list")
 
-    def cancel_order(self,
+    async def cancel_order(self,
                            order_id: int,
                            cl_ord_id: str = None,
                            activation_time: str = None,
                            custom_tag_50: str = None,
                            is_automated: bool = None) -> dict:
         """Make a request to cancel an order."""
-        return self._post(
-            url="/order/cancelorder",
+        return await self._session.post(
+            url="order/cancelorder",
             payload={
                 "orderId": order_id,
                 "clOrdId": cl_ord_id,
@@ -149,27 +174,27 @@ class Orders(TOClient):
             },
         )
 
-    def order_dependents(self, master_id: int) -> dict:
+    async def order_dependents(self, master_id: int) -> dict:
         """Retrieves all entities of Order type related to Account entity."""
-        return self._get(f"/order/deps?masterid={master_id}")
+        return await self._session.get(f"order/deps?masterid={master_id}")
 
-    def order_item(self, id: int) -> dict:
+    async def order_item(self, id: int) -> dict:
         """Retrieves an entity of Order type by its id."""
-        return self._get(f"/order/item?id={id}")
+        return await self._session.get(f"order/item?id={id}")
 
-    def order_items(self, ids: []) -> dict:
+    async def order_items(self, ids: list[int]) -> dict:
         """Retrieves multiple entities of Order type by its ids."""
-        return self._get(
-            f"/order/items?ids={','.join([str(id) for id in ids])}",
+        return await self._session.get(
+            f"order/items?ids={','.join([str(id) for id in ids])}",
         )
 
-    def order_L_dependents(self, master_ids: []) -> dict:
+    async def order_L_dependents(self, master_ids: list[int]) -> dict:
         """Retrieves all entities of Order type related to multiple entities of Account type."""
-        return self._get(
-            f"/order/ldeps?masterids={','.join([str(id) for id in master_ids])}",
+        return await self._session.get(
+            f"order/ldeps?masterids={','.join([str(id) for id in master_ids])}",
         )
 
-    def liquidate_position(self,
+    async def liquidate_position(self,
                                  account_id: int,
                                  contract_id: int,
                                  admin: bool,
@@ -182,19 +207,19 @@ class Orders(TOClient):
               Any operation could fail for a number of reasons, ranging from Exchange
               rejection to incorrect parameterization.
         """
-        return self._post(
-            url="/order/liquidateposition",
+        return await self._session.post(
+            url="order/liquidateposition",
             payload={
                 "accountId": account_id, "contractId": contract_id,
                 "admin": admin, "customTag50": custom_tag_50,
             },
         )
 
-    def order_list(self) -> dict:
+    async def order_list(self) -> dict:
         """Retrieves all entities of Order type."""
-        return self._get("/order/limit")
+        return await self._session.get("order/list")
 
-    def modify_order(self,
+    async def modify_order(self,
                            order_id: int,
                            order_qty: int,
                            order_type: str,
@@ -216,8 +241,8 @@ class Orders(TOClient):
         Note: This is no guarantee that the order can be modified in a given way.
               Market and exchange rules apply.
         """
-        return self._post(
-            url="/order/modifyorder",
+        return await self._session.post(
+            url="order/modifyorder",
             payload={
                 "orderId": order_id, "clOrdId": cl_ord_id,
                 "orderQty": order_qty, "orderType": order_type,
@@ -229,7 +254,7 @@ class Orders(TOClient):
             },
         )
 
-    def place_OCO(self,
+    async def place_OCO(self,
                         action: str,
                         symbol: str,
                         order_qty: int,
@@ -266,8 +291,8 @@ class Orders(TOClient):
         which determines the other parameters that must be set. For example a Limit or Stop
         order must use the price parameter, but a Stop-Limit will require a price and a stopPrice.
         """
-        return self._post(
-            url="/order/placeoco",
+        return await self._session.post(
+            url="order/placeoco",
             payload={
                 "accountSpec": account_spec, "accountId": account_id, "clOrdId": cl_ord_id,
                 "action": action, "symbol": symbol, "orderQty": order_qty, "orderType": order_type,
@@ -283,7 +308,7 @@ class Orders(TOClient):
             },
         )
 
-    def place_order(self,
+    async def place_order(self,
                           action: str,
                           symbol: str,
                           order_qty: int,
@@ -305,8 +330,8 @@ class Orders(TOClient):
         Make a request to place an order.
         Depending on the order type, the parameters vary.
         """
-        return self._post(
-            url="/order/placeorder",
+        return await self._session.post(
+            url="order/placeorder",
             payload={
                 "accountSpec": account_spec, "accountId": account_id, "clOrdId": cl_ord_id,
                 "action": action, "symbol": symbol, "orderQty": order_qty, "orderType": order_type,
@@ -316,7 +341,7 @@ class Orders(TOClient):
             },
         )
 
-    def place_OSO(self,
+    async def place_OSO(self,
                         action: str,
                         symbol: str,
                         order_qty: int,
@@ -358,8 +383,8 @@ class Orders(TOClient):
         Place an Order Sends Order order strategy.
         OSO orders allow for the most complex multi-bracket trading strategies.
         """
-        return self._post(
-            url="/order/placeoso",
+        return await self._session.post(
+            url="order/placeoso",
             payload={
                 "accountSpec": account_spec, "accountId": account_id, "clOrdId": cl_ord_id,
                 "action": action, "symbol": symbol, "orderQty": order_qty, "orderType": order_type,
@@ -381,44 +406,44 @@ class Orders(TOClient):
             },
         )
 
-    def order_strategy_dependents(self, master_id: int) -> dict:
+    async def order_strategy_dependents(self, master_id: int) -> dict:
         """Retrieves all entities of OrderStrategy type related to Account entity."""
-        return self._get(f"/orderStrategy/deps?masterid={master_id}")
+        return await self._session.get(f"orderStrategy/deps?masterid={master_id}")
 
-    def interrupt_order_strategy(self, order_strategy_id: int) -> dict:
+    async def interrupt_order_strategy(self, order_strategy_id: int) -> dict:
         """Stop a running multi-bracket strategy."""
-        return self._post(
-            url="/orderStrategy/interruptorderstrategy",
+        return await self._session.post(
+            url="orderStrategy/interruptorderstrategy",
             payload={"orderStrategyId": order_strategy_id},
         )
 
-    def order_strategy_item(self, id: int) -> dict:
+    async def order_strategy_item(self, id: int) -> dict:
         """Retrieves an entity of OrderStrategy type by its id."""
-        return self._get(f"/orderStrategy/item?id={id}")
+        return await self._session.get(f"orderStrategy/item?id={id}")
 
-    def order_strategy_items(self, ids: []) -> dict:
+    async def order_strategy_items(self, ids: list[int]) -> dict:
         """Retrieves multiple entities of OrderStrategy type by its ids."""
-        return self._get(
-            f"/orderStrategy/items?ids={','.join([str(id) for id in ids])}",
+        return await self._session.get(
+            f"orderStrategy/items?ids={','.join([str(id) for id in ids])}",
         )
 
-    def order_strategy_L_dependents(self, master_ids: []) -> dict:
+    async def order_strategy_L_dependents(self, master_ids: list[int]) -> dict:
         """Retrieves all entities of OrderStrategy type related to multiple entities of Account type."""
-        return self._get(
-            f"/orderStrategy/ldeps?masterids={','.join([str(id) for id in master_ids])}",
+        return await self._session.get(
+            f"orderStrategy/ldeps?masterids={','.join([str(id) for id in master_ids])}",
         )
 
-    def order_strategy_list(self) -> dict:
+    async def order_strategy_list(self) -> dict:
         """Retrieves all entities of OrderStrategy type."""
-        return self._get("/orderStrategy/list")
+        return await self._session.get("orderStrategy/list")
 
-    def modify_order_strategy(self,
+    async def modify_order_strategy(self,
                                     order_strategy_id: int,
                                     command: str,
                                     custom_tag_50: str = None) -> dict:
         """Modify the order strategy used for an existing order."""
-        return self._post(
-            url="/orderStrategy/modifyorderstrategy",
+        return await self._session.post(
+            url="orderStrategy/modifyorderstrategy",
             payload={
                 "orderStrategyId": order_strategy_id,
                 "command": command,
@@ -426,7 +451,7 @@ class Orders(TOClient):
             },
         )
 
-    def start_order_strategy(self,
+    async def start_order_strategy(self,
                                    symbol: str,
                                    order_strategy_type_id: int,
                                    action: str,
@@ -444,8 +469,8 @@ class Orders(TOClient):
         add them to brackets field on the params
         object as a JSON string.
         """
-        return self._post(
-            url="/orderStrategy/startorderstrategy",
+        return await self._session.post(
+            url="orderStrategy/startorderstrategy",
             payload={
                 "accountId": account_id,
                 "accountSpec": account_spec,
@@ -458,46 +483,46 @@ class Orders(TOClient):
             },
         )
 
-    def order_strategy_link_item(self, id: int) -> dict:
+    async def order_strategy_link_item(self, id: int) -> dict:
         """Retrieves an entity of OrderStrategyLink type by its id."""
-        return self._get(f"/orderStrategyLink/item?id={id}")
+        return await self._session.get(f"orderStrategyLink/item?id={id}")
 
-    def order_strategy_link_items(self, ids: []) -> dict:
+    async def order_strategy_link_items(self, ids: list[int]) -> dict:
         """Retrieves multiple entities of OrderStrategyLink type by its ids."""
-        return self._get(
-            f"/orderStrategyLink/items?ids={','.join([str(id) for id in ids])}",
+        return await self._session.get(
+            f"orderStrategyLink/items?ids={','.join([str(id) for id in ids])}",
         )
 
-    def order_strategy_link_L_dependents(self, master_ids: []) -> dict:
+    async def order_strategy_link_L_dependents(self, master_ids: list[int]) -> dict:
         """"Retrieves all entities of OrderStrategyLink type related to multiple entities of OrderStrategy type"""
-        return self._get(
-            f"/orderStrategyLink/ldeps?masterids={','.join([str(id) for id in master_ids])}",
+        return await self._session.get(
+            f"orderStrategyLink/ldeps?masterids={','.join([str(id) for id in master_ids])}",
         )
 
-    def order_strategy_link_list(self) -> dict:
+    async def order_strategy_link_list(self) -> dict:
         """Retrieves all entities of OrderStrategyLink type."""
-        return self._get("/orderStrategyLink/list")
+        return await self._session.get("orderStrategyLink/list")
 
-    def order_version_dependents(self, master_id: int) -> dict:
+    async def order_version_dependents(self, master_id: int) -> dict:
         """Retrieves all entities of OrderVersion type related to Order entity."""
-        return self._get(f"/orderVersion/deps?masterid={master_id}")
+        return await self._session.get(f"orderVersion/deps?masterid={master_id}")
 
-    def order_version_item(self, id: int) -> dict:
+    async def order_version_item(self, id: int) -> dict:
         """Retrieves an entity of OrderVersion type by its id."""
-        return self._get(f"/orderVersion/items?id={id}")
+        return await self._session.get(f"orderVersion/items?id={id}")
 
-    def order_version_items(self, ids: []) -> dict:
+    async def order_version_items(self, ids: list[int]) -> dict:
         """Retrieves multiple entities of OrderVersion type by its ids."""
-        return self._get(
-            f"/orderVersion/items?ids={','.join([str(id) for id in ids])}",
+        return await self._session.get(
+            f"orderVersion/items?ids={','.join([str(id) for id in ids])}",
         )
 
-    def order_version_L_dependents(self, master_ids: []) -> dict:
+    async def order_version_L_dependents(self, master_ids: list[int]) -> dict:
         """Retrieves all entities of OrderVersion type related to multiple entities of Order type."""
-        return self._get(
-            f"/orderVersion/masterids={','.join([str(id) for id in master_ids])}",
+        return await self._session.get(
+            f"orderVersion/masterids={','.join([str(id) for id in master_ids])}",
         )
 
-    def order_version_list(self) -> dict:
+    async def order_version_list(self) -> dict:
         """Retrieves all entities of OrderVersion type."""
-        return self._get("/orderVersion/list")
+        return await self._session.get("orderVersion/list")

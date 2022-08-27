@@ -1,65 +1,70 @@
-from .client import TOClient
+from __future__ import annotations
 
 
-class Risk(TOClient):
+class Risk:
+    """Class of methods related to risk."""
 
-    def account_risk_status_dependents(self, master_id: int) -> dict:
+    # -Constructor
+    def __init__(self, session) -> Risk:
+        self.session = session
+        
+    async def account_risk_status_dependents(self, master_id: int) -> dict:
         """Retrieves all entities of AccountRiskStatus type related to Account entity."""
-        return self._get(f"/accountRiskStatus/deps?masterid={master_id}")
+        return await self.session.get(f"accountRiskStatus/deps?masterid={master_id}")
 
-    def account_risk_status_item(self, id: int) -> dict:
+    async def account_risk_status_item(self, id: int) -> dict:
         """Retrieves an entity of AccountRiskStatus type by its id."""
-        return self._get(f"/accountRiskStatus/id={id}")
+        return await self.session.get(f"accountRiskStatus/id={id}")
 
-    def account_risk_status_items(self, ids: []) -> dict:
+    async def account_risk_status_items(self, ids: list[int]) -> dict:
         """Retrieves multiple entities of AccountRiskStatus type by its ids."""
-        return self._get(f"/accountRiskStatus/items?ids={','.join([str(id) for id in ids])}")
+        return await self.session.get(f"accountRiskStatus/items?ids={','.join([str(id) for id in ids])}")
 
-    def account_risk_status_L_dependents(self, master_ids: []) -> dict:
+    async def account_risk_status_L_dependents(self, master_ids: list[int]) -> dict:
         """Retrieves all entities of AccountRiskStatus type related to multiple entities of Account type."""
-        return self._get(f"/accountRiskStatus/ldeps?masterids={''.join([str(id) for id in master_ids])}")
+        return await self.session.get(f"accountRiskStatus/ldeps?masterids={''.join([str(id) for id in master_ids])}")
 
-    def account_risk_status_list(self) -> dict:
+    async def account_risk_status_list(self) -> dict:
         """Retrieves all entities of AccountRiskStatus type."""
-        return self._get("/accountRiskStatus/list")
+        return await self.session.get("accountRiskStatus/list")
 
-    def contract_margin_dependents(self, master_id: int) -> dict:
+    async def contract_margin_dependents(self, master_id: int) -> dict:
         """Retrieves all entities of ContractMargin type related to Contract entity."""
-        return self._get(f"/contractMargin/deps?masterid={master_id}")
+        return await self.session.get(f"contractMargin/deps?masterid={master_id}")
 
-    def contract_margin_item(self, id: int) -> dict:
+    async def contract_margin_item(self, id: int) -> dict:
         """Retrieves an entity of ContractMargin type by its id."""
-        return self._get(f"/contractMargin/item?id={id}")
+        return await self.session.get(f"contractMargin/item?id={id}")
 
-    def contract_margin_items(self, ids: []) -> dict:
+    async def contract_margin_items(self, ids: list[int]) -> dict:
         """Retrieves multiple entities of ContractMargin type by its ids."""
-        return self._get(f"/contractMargin/items?ids={','.join([str(id) for id in ids])}")
+        return await self.session.get(f"contractMargin/items?ids={','.join([str(id) for id in ids])}")
 
-    def contract_margin_L_dependents(self, master_ids: []) -> dict:
+    async def contract_margin_L_dependents(self, master_ids: list[int]) -> dict:
         """Retrieves all entities of ContractMargin type related to multiple entities of Contract type."""
-        return self._get(f"/contractMargin/ldeps?masterids={','.join([str(id) for id in master_ids])}")
+        return await self.session.get(f"contractMargin/ldeps?masterids={','.join([str(id) for id in master_ids])}")
 
-    def product_margin_dependents(self, master_id: int) -> dict:
+    async def product_margin_dependents(self, master_id: int) -> dict:
         """Retrieves all entities of ProductMargin type related to Product entity."""
-        return self._get(f"/productMargin/deps?masterid={master_id}")
+        return await self.session.get(f"productMargin/deps?masterid={master_id}")
 
-    def product_margin_item(self, id: int) -> dict:
+    async def product_margin_item(self, id: int) -> dict:
         """Retrieves an entity of ProductMargin type by its id."""
-        return self._get(f"/productMargin/item?id={id}")
+        return await self.session.get(f"productMargin/item?id={id}")
 
-    def product_margin_items(self, ids: []) -> dict:
+    async def product_margin_items(self, ids: list[int]) -> dict:
         """Retrieves multiple entities of ProductMargin type by its ids."""
-        return self._get(f"/productMargin/items?ids={','.join([str(id) for id in ids])}")
+        return await self.session.get(f"productMargin/items?ids={','.join([str(id) for id in ids])}")
 
-    def product_margin_L_dependents(self, master_ids: []) -> dict:
+    async def product_margin_L_dependents(self, master_ids: list[int]) -> dict:
         """Retrieves all entities of ProductMargin type related to multiple entities of Product type."""
-        return self._get(f"/productMargin/ldeps?masterids={master_ids}")
+        return await self.session.get(f"productMargin/ldeps?masterids={master_ids}")
 
-    def product_margin_list(self) -> dict:
+    async def product_margin_list(self) -> dict:
         """Retrieves all entities of ProductMargin type."""
-        return self._get("/productMargin/list")
+        return await self.session.get("productMargin/list")
 
-    def user_account_auto_liq_create(self,
+    async def user_account_auto_liq_create(self,
                                            id: int,
                                            changes_locked: bool,
                                            margin_percent_alert: int,
@@ -78,8 +83,8 @@ class Risk(TOClient):
                                            daily_profit_auto_liq: int,
                                            weekly_profit_auto_liq: int) -> dict:
         """Creates a new entity of UserAccountAutoLiq."""
-        return self._post(
-            url="/userAccountAutoLiq/create",
+        return await self.session.post(
+            url="userAccountAutoLiq/create",
             payload={
                 "id": id,
                 "changesLocked": changes_locked,
@@ -101,27 +106,27 @@ class Risk(TOClient):
             },
         )
 
-    def user_account_auto_liq_dependents(self, master_id: int) -> dict:
+    async def user_account_auto_liq_dependents(self, master_id: int) -> dict:
         """Retrieves all entities of UserAccountAutoLiq type related to Account entity."""
-        return self._get(f"/userAccountAutoLiq/deps?masterid={master_id}")
+        return await self.session.get(f"userAccountAutoLiq/deps?masterid={master_id}")
 
-    def user_account_auto_liq_item(self, id: int) -> dict:
+    async def user_account_auto_liq_item(self, id: int) -> dict:
         """Retrieves an entity of UserAccountAutoLiq type by its id."""
-        return self._get(f"/userAccountAutoLiq/item?id={id}")
+        return await self.session.get(f"userAccountAutoLiq/item?id={id}")
 
-    def user_account_auto_liq_items(self, ids: []) -> dict:
+    async def user_account_auto_liq_items(self, ids: list[int]) -> dict:
         """Retrieves multiple entities of UserAccountAutoLiq type by its ids."""
-        return self._get(f"/userAccountAutoLiq/item?ids={','.join([str(id) for id in ids])}")
+        return await self.session.get(f"userAccountAutoLiq/item?ids={','.join([str(id) for id in ids])}")
 
-    def user_account_auto_liq_L_dependents(self, master_ids: []) -> dict:
+    async def user_account_auto_liq_L_dependents(self, master_ids: list[int]) -> dict:
         """Retrieves all entities of UserAccountAutoLiq type related to multiple entities of Account type."""
-        return self._get(f"/userAccountAutoLiq/deps?masterid={','.join([str(id) for id in master_ids])}")
+        return await self.session.get(f"userAccountAutoLiq/deps?masterid={','.join([str(id) for id in master_ids])}")
 
-    def user_account_auto_liq_list(self) -> dict:
+    async def user_account_auto_liq_list(self) -> dict:
         """Retrieves all entities of UserAccountAutoLiq type."""
-        return self._get("/userAccountAutoLiq/list")
+        return await self.session.get("userAccountAutoLiq/list")
 
-    def user_account_auto_liq_update(self,
+    async def user_account_auto_liq_update(self,
                                            id: int,
                                            changes_locked: bool,
                                            margin_percent_alert: int,
@@ -140,8 +145,8 @@ class Risk(TOClient):
                                            daily_profit_auto_liq: int,
                                            weekly_profit_auto_liq: int) -> dict:
         """Updates an existing entity of UserAccountAutoLiq."""
-        return self._post(
-            url="/userAccountAutoLiq/update",
+        return await self.session.post(
+            url="userAccountAutoLiq/update",
             payload={
                 "id": id,
                 "changesLocked": changes_locked,
@@ -163,7 +168,7 @@ class Risk(TOClient):
             },
         )
 
-    def user_account_positions_limit(self,
+    async def user_account_positions_limit(self,
                                            account_id: int,
                                            active: bool,
                                            total_by: str,
@@ -181,8 +186,8 @@ class Risk(TOClient):
                                            exposed_limit: int = None,
                                            description: str = None) -> dict:
         """Creates a new entity of UserAccountPositionLimit."""
-        return self._post(
-            url="/userAccountPositionLimit/create",
+        return await self.session.post(
+            url="userAccountPositionLimit/create",
             payload={
                 "id": id,
                 "contractId": contract_id,
@@ -203,37 +208,37 @@ class Risk(TOClient):
             },
         )
 
-    def delete_user_account_position_limit(self, user_position_limit_id: int) -> dict:
+    async def delete_user_account_position_limit(self, user_position_limit_id: int) -> dict:
         """Remove an account position limit for a user."""
-        return self._post(
-            url="/userAccountPositionLimit/deleteuseraccountpositionlimit",
+        return await self.session.post(
+            url="userAccountPositionLimit/deleteuseraccountpositionlimit",
             payload={"userAccountPositionLimitId": user_position_limit_id},
         )
 
-    def delete_user_account_risk_parameter(self, user_account_risk_parameter_id: int) -> dict:
+    async def delete_user_account_risk_parameter(self, user_account_risk_parameter_id: int) -> dict:
         """Remove a Risk Setting parameter."""
-        return self._post(
-            url="/userAccountPositionLimit/deleteuseraccountriskparameter",
+        return await self.session.post(
+            url="userAccountPositionLimit/deleteuseraccountriskparameter",
             payload={"userAccountRiskParameterId": user_account_risk_parameter_id},
         )
 
-    def user_account_position_limit_dependents(self, master_id: int) -> dict:
+    async def user_account_position_limit_dependents(self, master_id: int) -> dict:
         """Retrieves all entities of UserAccountPositionLimit type related to Account entity."""
-        return self._get(f"/userAccountPositionLimit/deps?masterid={master_id}")
+        return await self.session.get(f"userAccountPositionLimit/deps?masterid={master_id}")
 
-    def user_account_position_limit_item(self, id: int) -> dict:
+    async def user_account_position_limit_item(self, id: int) -> dict:
         """Retrieves an entity of UserAccountPositionLimit type by its id."""
-        return self._get(f"/userAccountPositionLimit/item?id={id}")
+        return await self.session.get(f"userAccountPositionLimit/item?id={id}")
 
-    def user_account_position_limit_items(self, ids: []) -> dict:
+    async def user_account_position_limit_items(self, ids: list[int]) -> dict:
         """Retrieves multiple entities of UserAccountPositionLimit type by its ids."""
-        return self._get(f"/userAccountPositionLimit/item?id={','.join([str(id) for id in ids])}")
+        return await self.session.get(f"userAccountPositionLimit/item?id={','.join([str(id) for id in ids])}")
 
-    def user_account_position_limit_L_dependents(self, master_ids: []) -> dict:
+    async def user_account_position_limit_L_dependents(self, master_ids: list[int]) -> dict:
         """Retrieves all entities of UserAccountPositionLimit type related to multiple entities of Account type."""
-        return self._get(f"/userAccountPositionLimit/ldeps?masterids={','.join([str(id) for id in master_ids])}")
+        return await self.session.get(f"userAccountPositionLimit/ldeps?masterids={','.join([str(id) for id in master_ids])}")
 
-    def user_account_position_limit_update(self,
+    async def user_account_position_limit_update(self,
                                                  account_id: int,
                                                  active: bool,
                                                  total_by: str,
@@ -251,8 +256,8 @@ class Risk(TOClient):
                                                  exposed_limit: int = None,
                                                  description: str = None) -> dict:
         """Updates an existing entity of UserAccountPositionLimit."""
-        return self._post(
-            url="/userAccountPositionLimit/update",
+        return await self.session.post(
+            url="userAccountPositionLimit/update",
             payload={
                 "id": id,
                 "contractId": contract_id,
@@ -273,7 +278,7 @@ class Risk(TOClient):
             },
         )
 
-    def user_account_risk_parameter_create(self,
+    async def user_account_risk_parameter_create(self,
                                                  user_account_position_limit_id: int,
                                                  id: int = None,
                                                  contract_id: int = None,
@@ -291,8 +296,8 @@ class Risk(TOClient):
                                                  margin_dollar_value: int = None,
                                                  hard_limit: bool = None) -> dict:
         """Creates a new entity of UserAccountRiskParameter."""
-        return self._post(
-            url="/userAccountRiskParameter/create",
+        return await self.session.post(
+            url="userAccountRiskParameter/create",
             payload={
                 "id": id,
                 "contractId": contract_id,
@@ -313,30 +318,30 @@ class Risk(TOClient):
             },
         )
 
-    def user_account_risk_parameter_dependents(self, master_id: int) -> dict:
+    async def user_account_risk_parameter_dependents(self, master_id: int) -> dict:
         """Retrieves all entities of UserAccountRiskParameter type related to UserAccountPositionLimit entity."""
-        return self._get(f"/userAccountRiskParameter/deps?masterid={master_id}")
+        return await self.session.get(f"userAccountRiskParameter/deps?masterid={master_id}")
 
-    def user_account_risk_parameter_item(self, id: int) -> dict:
+    async def user_account_risk_parameter_item(self, id: int) -> dict:
         """Retrieves an entity of UserAccountRiskParameter type by its id."""
-        return self._get(f"/userAccountRiskParameter/item?id={id}")
+        return await self.session.get(f"userAccountRiskParameter/item?id={id}")
 
-    def user_account_risk_parameter_items(self, ids: []) -> dict:
+    async def user_account_risk_parameter_items(self, ids: list[int]) -> dict:
         """Retrieves multiple entities of UserAccountRiskParameter type by its ids."""
-        return self._get(
-            f"/userAccountRiskParameter/item?id={','.join([str(id) for id in ids])}",
+        return await self.session.get(
+            f"userAccountRiskParameter/item?id={','.join([str(id) for id in ids])}",
         )
 
-    def user_account_risk_parameter_L_dependents(self, master_ids: []) -> dict:
+    async def user_account_risk_parameter_L_dependents(self, master_ids: list[int]) -> dict:
         """
         Retrieves all entities of UserAccountRiskParameter type related to multiple entities of
         UserAccountPositionLimit type.
         """
-        return self._get(
-            f"/userAccountRiskParameter/ldeps?masterids={','.join([str(id) for id in master_ids])}",
+        return await self.session.get(
+            f"userAccountRiskParameter/ldeps?masterids={','.join([str(id) for id in master_ids])}",
         )
 
-    def user_account_risk_parameter_update(self,
+    async def user_account_risk_parameter_update(self,
                                                  user_account_position_limit_id: int,
                                                  id: int = None,
                                                  contract_id: int = None,
@@ -354,8 +359,8 @@ class Risk(TOClient):
                                                  margin_dollar_value: int = None,
                                                  hard_limit: bool = None) -> dict:
         """Updates an existing entity of UserAccountRiskParameter."""
-        return self._post(
-            url="/userAccountRiskParameter/update",
+        return await self.session.post(
+            url="userAccountRiskParameter/update",
             payload={
                 "id": id,
                 "contractId": contract_id,
