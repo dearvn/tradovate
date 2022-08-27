@@ -26,7 +26,9 @@ REQUIRED = [
     'pytz',
     'requests',
     'websocket-client',
-    'aiohttp'
+    'aiohttp',
+    'numpy',
+    'pandas_ta'
 ]
 
 # What packages are optional?

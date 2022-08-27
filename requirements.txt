@@ -3,3 +3,5 @@ pytz
 requests
 websocket-client
 aiohttp
+numpy
+pandas_ta
