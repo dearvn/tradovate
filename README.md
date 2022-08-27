@@ -25,6 +25,14 @@ TO_APPID="Sample App"
 TO_CID=0
 TO_SEC=Your API secret here
 
+# OR export in terminal to test local
+export TO_ENV=DEMO
+export TO_NAME=Your credentials here
+export TO_PASSWORD=Your credentials here
+export TO_APPID="Sample App"
+export TO_CID=0
+export TO_SEC=Your API secret here
+
 # run test
 python -m test
 
