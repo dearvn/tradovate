@@ -1,8 +1,6 @@
 ## Imports
 from __future__ import annotations
-import asyncio
-import json
-import logging
+import asyncio,os,requests,json,logging
 from asyncio import AbstractEventLoop
 from datetime import datetime, timedelta, timezone
 
@@ -50,7 +48,7 @@ class Session:
         '''Updates Session authorization fields'''
         res_dict = await res.json()
 
-        print(">>>>>>>>>>>+++++", res_dict)
+        #print(">>>>>>>>>>>+++++", res_dict)
 
         # -Invalid Credentials
         if 'errorText' in res_dict:
@@ -98,7 +96,7 @@ class Session:
     ) -> int:
         '''Request Session authorization'''
         log.debug("Session event 'request'")
-        print("Session event 'request'>>>>>>>>>>>>>>>>>", urls.http_auth_request)
+        #print("Session event 'request'>>>>>>>>>>>>>>>>>", urls.http_auth_request)
         res = await self._aiosession.post(urls.http_auth_request, json=auth)
         res_dict = await self._update_authorization(res)
 
@@ -174,7 +172,10 @@ class WebSocket:
     async def authorize(self, token: str) -> None:
         '''Request WebSocket authorization'''
         await self._socket_send(urls.wss_auth, body=token)
-        ws_res = (await self.poll_message())[0]
+        res = (await self.poll_message())
+        if res == None:
+            raise WebSocketAuthorizationException(self.url, token)
+        ws_res = res[0]
         if not ws_res or ws_res['s'] != 200:
             raise WebSocketAuthorizationException(self.url, token)
         self.authenticated.set()
@@ -185,9 +186,12 @@ class WebSocket:
         self.connected.clear()
         self.authenticated.clear()
 
-    async def poll_message(self) -> None:
+    async def poll_message(self, ticker = None, interval = None) -> None:
         '''Recieve dictionary object or None from aiowebsocket'''
         ws_res = await self._aiowebsocket.receive()
+        #print("*****************************************>>",len(ws_res.data), "<<*****************************************")
+        if not ws_res or not ws_res.data or isinstance(ws_res.data, int):
+            return None
         init_ = ws_res.data[0]
         if init_ == 'a':
             return json.loads(ws_res.data[1:])
