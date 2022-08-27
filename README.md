@@ -27,3 +27,6 @@ TO_SEC=Your API secret here
 
 # run test
 python -m test
+
+# run test bot trading demo
+python -m es5m_test
