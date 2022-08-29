@@ -38,3 +38,6 @@ python -m test
 
 # run test bot trading demo
 python -m es5m_test
+
+# Demo logic on Trading View
+Please refer to repo https://github.com/dearvn/trading-futures-tradingview-script to view my logic to trade Futures on Tradovate
